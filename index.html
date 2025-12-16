@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Azota – Bài kiểm tra Lịch sử 12 (Đầy đủ)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f5f7fb}
+header{background:#2d7df6;color:#fff;padding:16px 24px;font-size:20px;font-weight:bold}
+.container{max-width:1000px;margin:20px auto;background:#fff;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.08);padding:24px}
+.info{display:flex;justify-content:space-between;margin-bottom:16px;color:#555}
+.timer{font-weight:bold;color:#d32f2f}
+.question{margin-bottom:18px;border-bottom:1px solid #eee;padding-bottom:12px}
+.question h3{font-size:15px}
+.options label{display:block;padding:8px;border:1px solid #ddd;border-radius:6px;margin-bottom:6px;cursor:pointer}
+.options label:hover{background:#eef3ff;border-color:#2d7df6}
+button{background:#2d7df6;color:#fff;border:none;padding:12px 20px;font-size:16px;border-radius:8px;cursor:pointer}
+button:hover{background:#1c66d4}
+#result{margin-top:20px;font-size:18px;font-weight:bold}
+.correct{background:#e8f5e9;border-color:#2e7d32}
+.wrong{background:#ffebee;border-color:#c62828}
+</style>
+</head>
+<body>
+<header>Azota – Bài kiểm tra Lịch sử 12</header>
+<div class="container">
+<div class="info">
+<div>⏱ Thời gian còn lại: <span id="time" class="timer">45:00</span></div>
+<div>📘 80 câu trắc nghiệm</div>
+</div>
+<form id="quizForm"></form>
+<button onclick="submitQuiz()">Nộp bài</button>
+<div id="result"></div>
+</div>
+<script>
+/* ================== 80 CÂU HỎI + ĐÁP ÁN ================== */
+const questions = [
+  {
+    q: "Sau cách mạng tháng Tám năm 1945, thực dân đế quốc nào sau đây đã quay trở lại xâm lược Việt Nam?",
+    o: ["Anh", "Pháp", "Mỹ", "Nhật"],
+    a: 1
+  },
+  {
+    q: "Cuộc kháng chiến chống Pháp của nhân dân Việt Nam (1945–1954) diễn ra trong điều kiện",
+    o: [
+      "quan hệ quốc tế bị chi phối bởi trật tự hai cực I-an-ta.",
+      "nguy cơ chiến tranh thế giới hai đe dọa toàn nhân loại.",
+      "chế độ xã hội chủ nghĩa ở Liên Xô khủng hoảng sâu sắc.",
+      "trật tự thế giới đa cực đang trong giai đoạn hình thành."
+    ],
+    a: 0
+  },
+  {
+    q: "Đảng Cộng sản Đông Dương và Chính phủ Việt Nam Dân chủ Cộng hòa quyết định phát động cuộc kháng chiến toàn quốc chống thực dân Pháp (19-12-1946) ngay sau khi",
+    o: [
+      "Pháp đánh úp trụ sở Ủy ban nhân dân Nam Bộ.",
+      "Pháp chiếm Hải Phòng, Lạng Sơn.",
+      "cuộc đàm phán ở Phôngtennơblô (Pháp) thất bại.",
+      "Pháp gửi tối hậu thư cho Chính phủ Việt Nam."
+    ],
+    a: 3
+  },
+  {
+    q: "Âm mưu “đánh nhanh, thắng nhanh” của Pháp bị thất bại hoàn toàn bởi chiến thắng nào của ta?",
+    o: [
+      "Chiến dịch Việt Bắc thu – đông 1947",
+      "Chiến dịch biên giới thu – đông 1950",
+      "Cuộc Tiến công chiến lược đông – xuân 1953–1954",
+      "Chiến dịch Điện Biên Phủ 1954"
+    ],
+    a: 3
+  },
+  {
+    q: "Đại hội đại biểu toàn quốc lần thứ II của Đảng quyết định đưa Đảng ra hoạt động công khai với tên gọi mới là",
+    o: [
+      "Đảng Cộng Sản Đông Dương",
+      "Đảng Lao động Việt Nam",
+      "Đảng Cộng Sản Việt Nam",
+      "Đảng Lao động Đông Dương"
+    ],
+    a: 1
+  },
+  {
+    q: "Sau khi Hiệp định Giơnevơ 1954 về Đông Dương được kí kết, Mĩ đã có hành động gì ở miền Nam Việt Nam?",
+    o: [
+      "Đưa quân viễn chinh Mỹ vào miền Nam.",
+      "Dựng lên chính quyền tay sai Ngô Đình Diệm.",
+      "Xây dựng hệ thống “ấp chiến lược” ở miền Nam.",
+      "Đưa quân các nước đồng minh của Mỹ vào miền Nam."
+    ],
+    a: 1
+  },
+  {
+    q: "Một trong những thủ đoạn của Mĩ khi thực hiện chiến lược Chiến tranh đặc biệt ở miền Nam Việt Nam là",
+    o: [
+      "tiến hành dồn dân lập “ấp chiến lược”.",
+      "mở rộng chiến tranh ra toàn Đông Dương.",
+      "ồ ạt đưa quân Đồng minh của Mĩ vào miền Nam.",
+      "ồ ạt đưa quân Mĩ vào miền Nam Việt Nam."
+    ],
+    a: 0
+  },
+  {
+    q: "Phong trào Đồng khởi (1959–1960) ở miền Nam Việt Nam thắng lợi dẫn đến sự ra đời của",
+    o: [
+      "Mặt trận Việt Nam độc lập đồng minh.",
+      "Mặt trận Dân tộc giải phóng miền Nam Việt Nam.",
+      "Mặt trận Thống nhất dân tộc phản đế Đông Dương.",
+      "Mặt trận Liên hiệp quốc dân Việt Nam."
+    ],
+    a: 1
+  },
+  {
+    q: "Chiến thắng nào của quân dân miền Nam đã buộc Mỹ phải tuyên bố “phi Mỹ hoá” cuộc chiến tranh xâm lược ở Việt Nam?",
+    o: [
+      "Cuộc Tiến công chiến lược năm 1972.",
+      "Chiến thắng Vạn Tường năm 1965.",
+      "Cuộc Tổng tiến công và nổi dậy năm 1968.",
+      "Chiến thắng Ấp Bắc năm 1963."
+    ],
+    a: 2
+  },
+  {
+    q: "Từ năm 1961–1965, ở miền Nam Việt Nam, đế quốc Mĩ đã thực hiện chiến lược",
+    o: [
+      "Đông Dương hóa chiến tranh",
+      "chiến tranh đặc biệt.",
+      "chiến tranh cục bộ.",
+      "Việt Nam hoá chiến tranh."
+    ],
+    a: 1
+  },
+  {
+    q: "Thắng lợi quân sự mở đầu của quân dân ta trong chiến đấu chống “Chiến tranh cục bộ” là",
+    o: ["Vạn Tường.", "Ấp Bắc.", "Bình Giã.", "Ba Gia."],
+    a: 0
+  },
+  {
+    q: "Cuộc Tổng tiến công và nổi dậy Xuân 1975 ở miền Nam Việt Nam được mở đầu bằng chiến dịch nào sau đây?",
+    o: [
+      "Chiến dịch đường 14 – Phước Long.",
+      "Chiến dịch Tây Nguyên.",
+      "Chiến dịch Huế – Đà Nẵng.",
+      "Chiến dịch Hồ Chí Minh."
+    ],
+    a: 1
+  },
+  {
+    q: "Trong kháng chiến chống Pháp (1945–1954), chiến dịch Hòa Bình (1951–1952), chiến dịch Tây Bắc (1952) là những thắng lợi tiêu biểu của quân dân ta trên lĩnh vực nào sau đây?",
+    o: ["Quân sự", "Chính trị", "Ngoại giao", "Giáo dục"],
+    a: 0
+  },
+  {
+    q: "Năm 1953, thực dân Pháp đề ra kế hoạch Nava nhằm mục đích",
+    o: [
+      "khóa chặt biên giới Việt – Trung.",
+      "cô lập căn cứ địa Việt Bắc.",
+      "kết thúc chiến tranh trong danh dự.",
+      "quốc tế hóa chiến tranh Đông Dương."
+    ],
+    a: 2
+  },
+  {
+    q: "«Trong hai năm 1973–1974, miền Bắc đã đưa vào chiến trường miền Nam, Lào, Cam-pu-chia gần 20 vạn bộ đội. Đầu năm 1975 tăng thêm vào 57000 bộ đội». Đoạn thông tin trên phản ánh",
+    o: [
+      "vai trò của hậu phương miền Bắc cho các chiến trường ở Đông Dương.",
+      "quá trình hàn gắn vết thương chiến tranh và phát triển kinh tế ở miền Bắc.",
+      "thắng lợi của nhân dân miền Bắc trong chiến đấu chống chiến tranh phá hoại.",
+      "thành tựu trong công cuộc xây dựng chủ nghĩa xã hội ở miền Bắc về quân sự."
+    ],
+    a: 0
+  },
+  {
+    q: "Hội nghị 15 Ban chấp hành Trung ương Đảng Lao động Việt Nam (1-1959) quyết định để nhân dân miền Nam sử dụng bạo lực cách mạng là do",
+    o: [
+      "các lực lượng cách mạng ở miền Nam đã được trang bị đầy đủ vũ khí.",
+      "ta không thể tiếp tục dùng biện pháp đấu tranh hòa bình được nữa.",
+      "miền Nam đã có lực lượng chính trị và lực lượng vũ trang lớn mạnh.",
+      "Mĩ và chính quyền Sài Gòn phá hoại hiệp định Giơ-ne-vơ."
+    ],
+    a: 3
+  },
+  {
+    q: "Những câu thơ sau gợi nhớ đến chiến thắng lịch sử nào của ta trong cuộc kháng chiến chống Pháp (1945–1954)?\n“Năm mươi sáu ngày đêm\nkhoét núi, ngủ hầm, mưa dầm, cơm vắt\nMáu trộn bùn non\nGan không núng\nChí không mòn!”",
+    o: [
+      "Chiến dịch Việt Bắc thu – đông năm 1947.",
+      "Chiến dịch Biên giới thu – đông năm 1950.",
+      "Cuộc tiến công chiến lược Đông – Xuân 1953–1954.",
+      "Chiến dịch Điện Biên Phủ năm 1954."
+    ],
+    a: 3
+  },
+  {
+    q: "Chiến dịch Biên giới thu – đông (1950) và chiến dịch Điện Biên Phủ (1954) ở Việt Nam có điểm giống nhau nào sau đây?",
+    o: [
+      "Có sự linh hoạt, sáng tạo trong phương án tác chiến.",
+      "Đánh bại cuộc tấn công của Pháp vào cơ quan đầu não kháng chiến.",
+      "Có ý nghĩa quyết định đến thắng lợi trên mặt trận ngoại giao.",
+      "Đưa quân đội ta giành quyền chủ động trên chiến trường chính."
+    ],
+    a: 2
+  },
+  {
+    q: "Điểm khác nhau của chiến dịch Việt Bắc thu – đông năm 1947 so với chiến dịch biên giới thu – đông năm 1950 của quân dân Việt Nam là về",
+    o: ["đối tượng tác chiến.", "địa hình tác chiến.", "loại hình chiến dịch.", "lực lượng chủ yếu."],
+    a: 0
+  },
+  {
+    q: "So với các cuộc tiến công chiến lược trong Đông – Xuân 1953–1954, chiến dịch Điện Biên Phủ (1954) có điểm khác biệt nào sau đây?",
+    o: [
+      "Buộc Pháp phải phân tán lực lượng ra nhiều nơi khác nhau.",
+      "Đánh vào nơi quan trọng về chiến lược mà địch tương đối yếu.",
+      "Tập trung đánh vào cơ quan đầu não của quân Pháp tại Tây Bắc.",
+      "Đánh vào nơi quan trọng và mạnh nhất của quân Pháp."
+    ],
+    a: 3
+  },
+  {
+    q: "Một trong những điểm khác nhau giữa chiến dịch Hồ Chí Minh (1975) với chiến dịch Điện Biên Phủ (1954) ở Việt Nam là về",
+    o: ["quyết tâm giành thắng lợi.", "kết cục quân sự.", "sự huy động lực lượng cao nhất.", "địa bàn mở chiến dịch."],
+    a: 3
+  },
+  {
+    q: "Thắng lợi của nhân dân Việt Nam trong hai cuộc kháng chiến chống Pháp và chống Mĩ (1945–1975) đã",
+    o: [
+      "xóa bỏ chia cắt lãnh thổ và hoàn thành thống nhất đất nước về mặt Nhà nước.",
+      "chứng minh qua thực tiễn đường lối kháng chiến độc lập, tự chủ, sáng tạo của Đảng.",
+      "bước đầu hoàn thành cách mạng dân tộc dân chủ nhân dân trên phạm vi cả nước.",
+      "đưa Việt Nam thành quốc gia duy nhất thế giới đánh thắng chủ nghĩa thực dân kiểu mới."
+    ],
+    a: 1
+  },
+  {
+    q: "Trong cuộc kháng chiến chống Mĩ, cứu nước (1954–1975), chiến thắng nào sau đây của quân dân miền Nam buộc Mĩ phải kí Hiệp định Pari?",
+    o: [
+      "Chiến thắng Vạn Tường (Quảng Ngãi).",
+      "Chiến thắng Ấp Bắc (Mĩ Tho).",
+      "Trận “Điện Biên Phủ trên không”.",
+      "Chiến thắng Điện Biên Phủ."
+    ],
+    a: 2
+  },
+  {
+    q: "Trong cuộc kháng chiến chống Mỹ, cứu nước (1954–1975) của nhân dân Việt Nam, miền Bắc có vai trò nào sau đây?",
+    o: [
+      "Căn cứ địa vững chắc của cách mạng cả nước.",
+      "Chỗ đứng chân của chính quyền cách mạng lâm thời.",
+      "Nơi diễn ra các cuộc khởi nghĩa giành chính quyền.",
+      "Chiến trường trực tiếp xuyên suốt cuộc kháng chiến."
+    ],
+    a: 0
+  },
+  {
+    q: "Sau Chiến tranh thế giới thứ hai, quan hệ quốc tế có sự chuyển biến phức tạp và chịu sự ảnh hưởng trực tiếp của",
+    o: ["quan hệ giữa Mĩ và Trung Quốc.", "Chiến tranh lạnh.", "xu thế toàn cầu hoá.", "Liên Xô."],
+    a: 1
+  },
+  {
+    q: "Sau Cách mạng tháng Tám 1945, một trong những khó khăn mà nước Việt Nam Dân chủ Cộng hoà phải đối mặt là",
+    o: ["thù trong giặc ngoài.", "bị Mỹ bao vây, cấm vận.", "chiến tranh tàn phá đất nước nặng nề.", "phát xít Nhật quay trở lại Đông Dương."],
+    a: 0
+  },
+  {
+    q: "Thực dân Pháp mở đầu cuộc chiến tranh xâm lược Việt Nam lần thứ hai bằng việc",
+    o: [
+      "tấn công vào Đà Nẵng.",
+      "tấn công trụ sở Uỷ ban Nhân dân Nam Bộ.",
+      "tấn công lên Việt Bắc.",
+      "tấn công các cơ quan hành chính ở Hà Nội."
+    ],
+    a: 1
+  },
+  {
+    q: "Ngày 18 và 19-12-1946, Ban Thường vụ TW Đảng họp tại Hà Nội đã quyết định",
+    o: [
+      "tiến hành đàm phán với thực dân Pháp.",
+      "lên án hành động xâm lược của thực dân Pháp với quốc tế.",
+      "phát động toàn quốc kháng chiến.",
+      "thành lập các An toàn khu."
+    ],
+    a: 2
+  },
+  {
+    q: "“Chúng ta thà hy sinh tất cả chứ nhất định không chịu mất nước, nhất định không chịu làm nô lệ”. Đây là câu nói của Chủ tịch Hồ Chí Minh trong",
+    o: [
+      "“Tuyên ngôn độc lập”.",
+      "“Nhật ký trong tù”.",
+      "“Kháng chiến nhất định thắng lợi”.",
+      "“Lời kêu gọi toàn quốc kháng chiến”."
+    ],
+    a: 3
+  },
+  {
+    q: "Kết quả của cuộc chiến đấu chống Pháp ở Hà Nội của quân dân ta là",
+    o: [
+      "giải phóng được thủ đô Hà Nội.",
+      "phá hủy nhiều kho tàng của thực dân Pháp.",
+      "tiêu diệt toàn bộ quân Pháp ở thủ đô Hà Nội.",
+      "giam chân địch trong thành phố để ta chuẩn bị lực lượng kháng chiến."
+    ],
+    a: 3
+  },
+  {
+    q: "Tại Đại hội đại biểu toàn quốc lần II (tháng 2-1951), Đảng Cộng sản Đông Dương quyết định tách Đảng và thành lập ở mỗi nước Đông Dương một Đảng Mác – Lênin vì",
+    o: [
+      "vì đặc điểm riêng của từng quốc gia.",
+      "vì xu thế phát triển của thế giới.",
+      "vì sự chỉ đạo của Quốc tế Cộng sản.",
+      "vì nguyện vọng của nhân dân ba nước Đông Dương."
+    ],
+    a: 0
+  },
+  {
+    q: "Chiến thắng nào quyết định thắng lợi của Hội nghị Giơ-ne-vơ?",
+    o: [
+      "Chiến thắng Biên giới.",
+      "Chiến thắng Tây Bắc.",
+      "Chiến thắng Đông Xuân 1953–1954.",
+      "Chiến thắng Điện Biên Phủ 1954."
+    ],
+    a: 3
+  },
+  {
+    q: "Nguyên nhân cơ bản nhất quyết định sự thắng lợi cuộc kháng chiến chống thực dân Pháp (1945–1954)?",
+    o: [
+      "Sự lãnh đạo sáng suốt của Đảng đứng đầu là Chủ tịch Hồ Chí Minh với đường lối chính trị, quân sự, kháng chiến đúng đắn.",
+      "Truyền thống yêu nước, anh hùng bất khuất của dân tộc.",
+      "Có hậu phương vững chắc và khối đoàn kết toàn dân.",
+      "Tình đoàn kết chiến đấu của nhân dân 3 nước Đông Dương và sự ủng hộ của nhân dân tiến bộ thế giới."
+    ],
+    a: 0
+  },
+  {
+    q: "Yếu tố nào sau đây không phản ánh bước phát triển cao hơn của chiến dịch Biên giới so với chiến dịch Việt Bắc?",
+    o: [
+      "Ta chủ động mở chiến dịch.",
+      "Ta giành quyền chủ động trên chiến trường chính Bắc Bộ.",
+      "Phương thức tác chiến đa dạng.",
+      "Pháp buộc phải chuyển sang đánh lâu dài với ta."
+    ],
+    a: 3
+  },
+  {
+    q: "Điểm mới của chiến dịch Biên giới thu – đông 1950 so với chiến dịch Việt Bắc là",
+    o: ["ta chủ động đánh Pháp.", "Pháp chủ động đánh ta.", "Pháp bị thất bại.", "ta thất bại."],
+    a: 0
+  },
+  {
+    q: "Điểm chung trong kế hoạch Rơve năm 1949 và kế hoạch Đờ Lát đơ Tát-xin-hi năm 1950 là gì?",
+    o: [
+      "Bảo vệ chính quyền tay sai do Pháp lập ra.",
+      "Muốn xoay chuyển cục diện chiến tranh.",
+      "Nhanh chóng kết thúc chiến tranh.",
+      "Thể hiện sức mạnh quân sự của Pháp."
+    ],
+    a: 1
+  },
+  {
+    q: "Điểm mới trong xác định kẻ thù của cách mạng Việt Nam giai đoạn 1951–1953 so với giai đoạn 1946–1950 là gì?",
+    o: [
+      "Chống thực dân Pháp và phong kiến.",
+      "Chống thực dân Pháp và can thiệp Mĩ.",
+      "Chống thực dân Pháp và tay sai.",
+      "Chống thực dân Pháp và các đảng phái phản động."
+    ],
+    a: 1
+  },
+  {
+    q: "Điểm khác nhau cơ bản của chiến dịch Việt Bắc thu – đông năm 1947 so với chiến dịch Biên giới thu – đông năm 1950 của quân dân Việt Nam là về",
+    o: ["loại hình chiến dịch.", "địa hình tác chiến.", "đối tượng tác chiến.", "lực lượng chủ yếu."],
+    a: 2
+  },
+  {
+    q: "So với kế hoạch Rơve (1949) thì kế hoạch Đờ Lát Đơ Tát-xin-hi (1950) được xem là:",
+    o: [
+      "một bước tiến trong cuộc chiến tranh xâm lược của Pháp ở Đông Dương.",
+      "một bước lùi trong cuộc chiến tranh xâm lược của Pháp ở Đông Dương.",
+      "sự bế tắc của Pháp trong cuộc chiến tranh xâm lược ở Đông Dương.",
+      "sự thỏa hiệp của Pháp và Mĩ trong cuộc chiến tranh xâm lược ở Đông Dương."
+    ],
+    a: 0
+  },
+  {
+    q: "Âm mưu của Mĩ trong việc kí với Pháp “Hiệp định phòng thủ chung Đông Dương” và với Bảo Đại “Hiệp ước hợp tác kinh tế Việt – Mĩ” trong những năm 1950–1951 là gì?",
+    o: [
+      "Hỗ trợ kinh tế, tài chính cho Pháp tiến hành chiến tranh.",
+      "Tạo sự ràng buộc về kinh tế, tài chính với Pháp.",
+      "Trực tiếp ràng buộc chính phủ Bảo Đại vào Mĩ.",
+      "Từng bước can thiệp, thay chân Pháp ở Đông Dương."
+    ],
+    a: 3
+  },
+  {
+    q: "Điểm giống nhau giữa chiến thắng Điện Biên Phủ năm 1954 với chiến thắng “Điện Biên Phủ trên không” năm 1972 là",
+    o: [
+      "những thắng lợi quân sự quyết định buộc Pháp – Mĩ phải ký kết các hiệp định với ta.",
+      "những thắng lợi quân sự quyết định buộc Pháp – Mĩ phải rút quân về nước.",
+      "những thắng lợi quân sự quyết định buộc Pháp – Mĩ phải kết thúc cuộc chiến tranh.",
+      "những thắng lợi quân sự quyết định buộc Pháp – Mĩ phải công nhận các quyền dân tộc cơ bản của ba nước Đông Dương."
+    ],
+    a: 0
+  },
+  {
+    q: "Đánh giá đúng nhất về tình thế của Pháp trên chiến trường Đông Dương khi thực hiện kế hoạch Đờ Lát đơ Tát-xin-hi?",
+    o: [
+      "Là kế hoạch quân sự phản ánh sự nỗ lực cao nhất của Pháp và Mĩ nhằm kết thúc chiến tranh.",
+      "Là kế hoạch quân sự phản ánh tình thế trên chiến trường không gì cứu vãn nổi của Pháp ở Đông Dương.",
+      "Là kế hoạch quân sự đánh dấu sự lệ thuộc hoàn toàn của Pháp vào Mĩ để tiếp tục cuộc chiến tranh ở Đông Dương.",
+      "Là kế hoạch quân sự phản ánh sự nỗ lực cao nhất của Pháp dưới sự hỗ trợ tích cực của Mĩ nhằm sớm kết thúc chiến tranh."
+    ],
+    a: 3
+  },
+  {
+    q: "Thắng lợi của nhân dân Việt Nam trong cuộc kháng chiến chống thực dân Pháp (1945–1954) đã có tác động như thế nào đến hệ thống thuộc địa của chủ nghĩa đế quốc?",
+    o: [
+      "Làm sụp đổ hệ thống thuộc địa của chủ nghĩa thực dân kiểu cũ trên thế giới.",
+      "Mở đầu quá trình sụp đổ hệ thống thuộc địa của chủ nghĩa thực dân kiểu cũ trên thế giới.",
+      "Mở đầu quá trình sụp đổ hệ thống thuộc địa của chủ nghĩa thực dân kiểu mới trên thế giới.",
+      "Làm sụp đổ hệ thống thuộc địa của chủ nghĩa thực dân kiểu mới trên thế giới."
+    ],
+    a: 1
+  },
+  {
+    q: "Từ việc thành lập Mặt trận Liên Việt (3-1951) Việt Nam có thể rút ra bài học kinh nghiệm gì về xây dựng mặt trận hiện nay?",
+    o: [
+      "Xây dựng khối liên minh công–nông.",
+      "Xây dựng khối đoàn kết dân tộc.",
+      "Đoàn kết các tôn giáo.",
+      "Đoàn kết các dân tộc."
+    ],
+    a: 1
+  },
+  {
+    q: "Từ thành công của Đại hội Đảng toàn quốc lần II (2-1951), bài học cơ bản nào Việt Nam có thể rút ra để giải quyết vấn đề biển đảo hiện nay?",
+    o: [
+      "Tăng cường sự lãnh đạo của Đảng.",
+      "Tăng cường khối đoàn kết dân tộc.",
+      "Tăng cường sự đoàn kết quốc tế.",
+      "Tăng cường tiềm lực kinh tế, quốc phòng."
+    ],
+    a: 0
+  },
+  {
+    q: "Sau Hiệp định Giơnevơ về Đông Dương năm 1954, nước nào sau đây đã thay chân Pháp ở miền Nam và dựng lên chính quyền tay sai Ngô Đình Diệm?",
+    o: ["Mĩ", "Anh", "Liên Xô", "Trung Quốc"],
+    a: 0
+  },
+  {
+    q: "Sau Hiệp định Giơnevơ về Đông Dương năm 1954, Mĩ vào miền Nam Việt Nam nhằm thực hiện âm mưu nào sau đây?",
+    o: [
+      "Biến miền Nam thành thuộc địa kiểu mới duy nhất.",
+      "Chia cắt lâu dài Việt Nam.",
+      "Biến miền Nam thành căn cứ quân sự của Mỹ ở châu Âu.",
+      "Thúc đẩy phong trào giải phóng dân tộc ở miền Nam."
+    ],
+    a: 1
+  },
+  {
+    q: "Đặc điểm cơ bản của nước ta sau hiệp định Giơnevơ về Đông Dương năm 1954 là:",
+    o: [
+      "Miền Nam được hoàn toàn giải phóng.",
+      "Miền Bắc tiếp tục chống Mỹ.",
+      "Cả nước trực tiếp đánh Mỹ và chính quyền tay sai.",
+      "Tạm thời bị chia cắt thành hai miền."
+    ],
+    a: 3
+  },
+  {
+    q: "Nội dung nào sau đây là đúng khi nói về nhiệm vụ cách mạng của miền Nam từ 1954–1975?",
+    o: [
+      "Tiến hành cách mạng xã hội chủ nghĩa.",
+      "Đấu tranh chống chủ nghĩa thực dân cũ.",
+      "Tiến hành đổi mới đất nước.",
+      "Tiến hành cách mạng dân tộc dân chủ nhân dân."
+    ],
+    a: 3
+  },
+  {
+    q: "Cuộc tiến công chiến lược năm 1972, quân cách mạng đã chọc thủng các phòng tuyến nào sau đây của địch?",
+    o: [
+      "Hà Nội, Hải Phòng, Hòa Bình.",
+      "Điện Biên Phủ, Bến Tre.",
+      "Quảng Trị, Tây Nguyên, Đông Nam Bộ.",
+      "Nghệ An, Hà Tĩnh."
+    ],
+    a: 2
+  },
+  {
+    q: "Nội dung nào là không đúng khi nói về bối cảnh của cuộc kháng chiến chống Mỹ cứu nước ở Việt Nam từ 1954–1975:",
+    o: [
+      "Liên Xô, Mỹ đang bị khủng hoảng kinh tế và chính trị.",
+      "chiến tranh lạnh đang diễn ra căng thẳng.",
+      "cục diện đối đầu Đông – Tây đang diễn ra căng thẳng.",
+      "công cuộc xây dựng chủ nghĩa xã hội ở Liên Xô, Trung Quốc đạt được nhiều thành tựu."
+    ],
+    a: 0
+  },
+  {
+    q: "Trong giai đoạn 1954–1960, miền Bắc Việt Nam thực hiện nội dung nào sau đây?",
+    o: [
+      "Chống lại chiến lược chiến tranh đặc biệt của Mỹ.",
+      "Hoàn thành cải cách ruộng đất, khôi phục kinh tế.",
+      "Trực tiếp chống Mỹ và chính quyền tay sai.",
+      "Tiến hành phong trào Đồng Khởi."
+    ],
+    a: 1
+  },
+  {
+    q: "Với việc hoàn thành cải cách ruộng đất ở miền Bắc, khẩu hiệu nào sau đây đã trở thành hiện thực:",
+    o: [
+      "“thành lập chính quyền công – nông – binh”",
+      "“thả từ chính trị”",
+      "“người cày có ruộng”",
+      "“đả đảo đế quốc, đả đảo phong kiến”"
+    ],
+    a: 2
+  },
+  {
+    q: "Nhiệm vụ trọng tâm trong công cuộc xây dựng và phát triển kinh tế xã hội ở miền Bắc giai đoạn 1958–1960 là gì?",
+    o: [
+      "Phát triển thành phần kinh tế quốc doanh.",
+      "Phát triển thành phần kinh tế tư nhân.",
+      "Chống chiến tranh phá hoại của Mỹ.",
+      "Xây dựng nền kinh tế hàng hóa nhiều thành phần."
+    ],
+    a: 0
+  },
+  {
+    q: "Từ những năm 1954–1960, Miền Nam Việt Nam thực hiện nhiệm vụ nào sau đây?",
+    o: [
+      "Chống lại chiến lược chiến tranh đặc biệt của Mỹ.",
+      "Chống Mỹ và chính quyền Ngô Đình Diệm, đòi thi hành hiệp định Giơnevơ.",
+      "Thực hiện phong trào phá ấp chiến lược.",
+      "Thực hiện cải cách giáo dục."
+    ],
+    a: 1
+  },
+  {
+    q: "Hội nghị lần thứ 15 Ban chấp hành Trung ương Đảng Lao Động Việt Nam (1/1959) sử dụng phương pháp đấu tranh nào sau đây:",
+    o: [
+      "tiến hành tổng khởi nghĩa",
+      "bạo lực cách mạng",
+      "giữ gìn lực lượng",
+      "chỉ thực hiện đấu tranh chính trị"
+    ],
+    a: 1
+  },
+  {
+    q: "Phong trào Đồng Khởi ở miền Nam diễn ra tiêu biểu nhất ở tỉnh nào sau đây:",
+    o: ["Hà Nội", "Bến Tre", "Hải Phòng", "Long An"],
+    a: 1
+  },
+  {
+    q: "Hội nghị lần thứ 15 Ban chấp hành Trung ương Đảng Lao Động Việt Nam (1/1959) đã xác định kẻ thù của nhân dân miền Nam là:",
+    o: [
+      "chính quyền Mỹ – Diệm",
+      "thực dân Pháp",
+      "thực dân Anh",
+      "chế độ phản động thuộc địa."
+    ],
+    a: 0
+  },
+  {
+    q: "Trong chiến lược Chiến tranh đặc biệt 1961–1965 Mỹ sử dụng lực lượng quân đội nào sau đây là chủ yếu?",
+    o: [
+      "Quân đội Sài Gòn",
+      "Cố vấn Mỹ",
+      "Quân đồng minh của Mỹ",
+      "Quân viễn chinh Mỹ"
+    ],
+    a: 0
+  },
+  {
+    q: "Sau thất bại của chiến lược chiến tranh cục bộ 1965–1968 Mỹ đã triển khai chiến lược chiến tranh nào sau đây?",
+    o: [
+      "Chiến tranh đặc biệt",
+      "Việt Nam hóa chiến tranh",
+      "Cuộc tổng tiến công và nổi dậy Xuân năm 1975",
+      "Phong trào Đồng Khởi"
+    ],
+    a: 1
+  },
+  {
+    q: "Trong chiến lược Việt Nam hóa chiến tranh (1969–1973), Mỹ đã sử dụng lực lượng quân đội nào sau đây là chủ yếu?",
+    o: [
+      "Quân Mỹ",
+      "Quân đồng minh của Mỹ",
+      "Quân đội Sài Gòn",
+      "Cố vấn Mỹ"
+    ],
+    a: 2
+  },
+  {
+    q: "Từ năm 1961 đến năm 1965 miền Bắc thực hiện nhiệm vụ cách mạng nào sau đây:",
+    o: [
+      "xây dựng xã hội chủ nghĩa, làm nghĩa vụ hậu phương",
+      "chống chiến lược chiến tranh đặc biệt của Mỹ",
+      "phối hợp với quân Lào Campuchia chống Mỹ",
+      "thành lập Mặt trận Dân tộc Giải phóng miền Nam Việt Nam"
+    ],
+    a: 0
+  },
+  {
+    q: "Từ năm 1961 đến năm 1965 miền Nam Việt Nam có hoạt động nào sau đây:",
+    o: [
+      "tiến hành cách mạng xã hội chủ nghĩa",
+      "chống chiến lược chiến tranh đặc biệt của Mỹ",
+      "đấu tranh giữ gìn lực lượng đòi Mĩ thi hành hiệp định Giơnevơ",
+      "chống chiến lược chiến tranh cục bộ của Mỹ"
+    ],
+    a: 1
+  },
+  {
+    q: "Phong trào Đồng Khởi ở miền Nam những năm 1959–1960 để lại ý nghĩa nào sau đây",
+    o: [
+      "Buộc Mỹ phải ngồi vào bàn đàm phán",
+      "Làm sụp đổ hoàn toàn chính quyền tay sai Ngô Đình Diệm",
+      "Ta giành thế chủ động trên chiến trường chính Bắc Bộ",
+      "Cách mạng miền Nam chuyển từ thế giữ gìn lực lượng sang tiến công"
+    ],
+    a: 3
+  },
+  {
+    q: "Đây là một trong những thủ đoạn của Mỹ thực hiện trong chiến lược Chiến tranh đặc biệt 1961–1965?",
+    o: [
+      "Dồn dân lập ấp chiến lược",
+      "Đưa quân Mỹ vào trực tiếp tham chiến",
+      "Mở các cuộc hành quân tìm diệt và bình định",
+      "Tiến hành xâm lược Lào và Campuchia"
+    ],
+    a: 0
+  },
+  {
+    q: "Chiến thuật mới nào sau đây được Mỹ sử dụng phổ biến trong chiến lược Chiến tranh đặc biệt (1961–1965)?",
+    o: [
+      "Trực thăng vận, thiết xa vận",
+      "Dồn dân lập chiến lược",
+      "Đánh công kiên",
+      "Đánh nghi binh"
+    ],
+    a: 0
+  },
+  {
+    q: "Tổ chức nào sau đây là ngọn cờ đoàn kết nhân dân miền Nam chống Mỹ và chính quyền Sài Gòn?",
+    o: [
+      "Đảng Cộng sản Đông Dương",
+      "Mặt trận Dân tộc giải phóng miền Nam Việt Nam",
+      "Mặt trận Việt Minh",
+      "Chính quyền Xô Viết Nghệ Tĩnh"
+    ],
+    a: 1
+  },
+  {
+    q: "Trong những năm 1965–1968 nhân dân miền Nam có hoạt động nào sau đây?",
+    o: [
+      "Chống chiến lược chiến tranh đặc biệt của Mỹ",
+      "Chống chiến lược chiến tranh cục bộ của Mỹ",
+      "Chống chiến lược Việt Nam hóa chiến tranh của Mỹ",
+      "Tiến hành Phong trào Đồng Khởi"
+    ],
+    a: 1
+  },
+  {
+    q: "Sử dụng quân đội Mỹ là chủ yếu kết hợp với quân đồng minh của Mỹ là thủ đoạn của Mỹ khi thực hiện chiến lược chiến tranh nào ở Việt Nam?",
+    o: [
+      "Chiến lược cam kết và mở rộng",
+      "Chiến lược chiến tranh cục bộ",
+      "Chiến lược chiến tranh đặc biệt",
+      "Chiến lược Việt Nam hóa chiến tranh"
+    ],
+    a: 1
+  },
+  {
+    q: "Đây là một trong những thắng lợi quân sự mở đầu của nhân dân miền Nam khi chống chiến lược chiến tranh cục bộ của Mỹ giai đoạn 1965–1968?",
+    o: [
+      "Ấp Bắc – Mỹ Tho",
+      "Cuộc tổng tiến công và nổi dậy xuân Mậu Thân 1968",
+      "Trận Điện Biên Phủ trên không",
+      "Trận Vạn Tường"
+    ],
+    a: 3
+  },
+  {
+    q: "Thực hiện Nghị quyết 21 Ban chấp hành Trung ương Đảng Lao động Việt Nam năm 1973, nhân dân miền Nam đã:",
+    o: [
+      "chống bình định lấn chiếm",
+      "chống chiến lược chiến tranh cục bộ",
+      "bắt đầu chống chiến lược Việt Nam hóa chiến tranh",
+      "mở ngay cuộc tổng tiến công xuân giải phóng hoàn toàn miền Nam."
+    ],
+    a: 0
+  },
+  {
+    q: "Sự kiện nào sau đây đánh dấu Mỹ chính thức mở rộng bằng không quân và hải quân phá hoại miền Bắc lần 1 (2/1965)?",
+    o: [
+      "Sự kiện Vịnh Bắc Bộ",
+      "Thông điệp của tổng thống Truman",
+      "Mỹ tấn công quân giải phóng ở Vạn Tường",
+      "Phá hoại bằng không quân 12 ngày đêm tại Hà Nội"
+    ],
+    a: 0
+  },
+  {
+    q: "Từ sự phát triển của phong trào Đồng Khởi ở miền Nam những năm 1960 đã đưa đến",
+    o: [
+      "sự ra đời của Mặt trận Dân tộc Giải phóng miền Nam Việt Nam",
+      "thành lập chính phủ Cách mạng lâm thời Cộng hòa miền Nam Việt Nam",
+      "kết thúc cuộc kháng chiến chống Mỹ",
+      "buộc Mỹ phải ngồi vào bàn đàm phán"
+    ],
+    a: 0
+  },
+  {
+    q: "Đại hội Đại biểu toàn quốc lần thứ III của Đảng Lao động Việt Nam tháng 9/1960 đã xác định nhiệm vụ của cách mạng miền Bắc là:",
+    o: [
+      "cách mạng xã hội chủ nghĩa",
+      "cách mạng dân tộc dân chủ nhân dân",
+      "trực tiếp chống chiến lược chiến tranh đặc biệt của Mỹ",
+      "chống chiến tranh phá hoại miền Bắc của Mỹ"
+    ],
+    a: 0
+  },
+  {
+    q: "Trong chiến lược Việt Nam hóa chiến tranh của Mỹ ở Việt Nam (1969–1973) Mỹ không thực hiện hoạt động nào sau đây?",
+    o: [
+      "rút dần quân Mỹ và quân đồng minh để giảm xương máu của người Mỹ.",
+      "tăng cường quân Mỹ vào chiến trường.",
+      "tăng cường lực lượng cho quân đội Sài Gòn.",
+      "mở rộng chiến tranh ra toàn Đông Dương."
+    ],
+    a: 1
+  },
+  {
+    q: "Trong giai đoạn 1969 đến 1973, tổ chức nào đã ra đời ở miền Nam là chính phủ hợp pháp của nhân dân miền Nam Việt Nam?",
+    o: [
+      "Chính quyền Xô Viết",
+      "Ủy ban nhân dân tự quản",
+      "Chính phủ Cách mạng lâm thời Cộng hòa miền Nam Việt Nam",
+      "quân giải phóng miền Nam"
+    ],
+    a: 2
+  },
+  {
+    q: "Cuộc kháng chiến chống Mỹ cứu nước ở Việt Nam từ 1954–1975 diễn ra trong bối cảnh nào sau đây?",
+    o: [
+      "Chiến tranh lạnh diễn ra ngày càng căng thẳng.",
+      "Xu thế hòa hoãn Đông – Tây đang chiếm ưu thế",
+      "Xô – Mỹ chấm dứt chiến tranh lạnh",
+      "Chiến tranh thế giới thứ hai diễn ra ác liệt."
+    ],
+    a: 0
+  },
+  {
+    q: "Thắng lợi quân sự nào sau đây có ý nghĩa quyết định buộc Mỹ phải quay lại đàm phán và ký hiệp định Pari chấm dứt chiến tranh ở Việt Nam?",
+    o: [
+      "trận Điện Biên Phủ trên không",
+      "Chiến thắng Vạn Tường",
+      "Chiến dịch Việt Bắc",
+      "chiến dịch Biên giới Thu Đông"
+    ],
+    a: 0
+  },
+  {
+    q: "Năm 1972, Mỹ đã tiến hành tập kích bằng không quân và hải quân trong 12 ngày đêm vào Hà Nội, Hải Phòng nhằm mục đích nào sau đây?",
+    o: [
+      "giành thắng lợi quân sự quyết định buộc Việt Nam ký vào Hiệp định có lợi cho Mỹ",
+      "giành thế chủ động trên chiến trường chính Bắc Bộ.",
+      "Cứu nguy cho chiến lược chiến tranh cục bộ",
+      "là trận quyết định để kết thúc chiến lược chiến tranh đặc biệt"
+    ],
+    a: 0
+  },
+  {
+    q: "Cuộc tổng tiến công và nổi dậy xuân Mậu Thân năm 1968 đã để lại ý nghĩa nào sau đây?",
+    o: [
+      "buộc Mỹ phải quay lại đàm phán với ta ở Pari",
+      "Mở ra khả năng có thể kết thúc chiến tranh bằng giải pháp ngoại giao.",
+      "phá sản bước đầu chiến lược chiến tranh đặc biệt của Mỹ",
+      "phá sản hoàn toàn chiến tranh đặc biệt của Mỹ"
+    ],
+    a: 0
+  },
+  {
+    q: "Nội dung nào sau đây là đúng khi nói về ý nghĩa của cuộc kháng chiến chống Mỹ cứu nước đối với nhân dân Việt Nam (1954–1975):",
+    o: [
+      "Mở đầu kỷ nguyên độc lập, thống nhất, đi lên xây dựng Chủ nghĩa xã hội",
+      "đánh dấu lần đầu tiên quan hệ ngoại giao được mở rộng",
+      "tác động mạnh mẽ đến tình hình nước Mỹ và thế giới",
+      "lần đầu tiên người dân được thực hiện quyền công dân"
+    ],
+    a: 0
+  },
+  {
+    q: "Nguyên nhân chủ quan dẫn đến thắng lợi của cuộc kháng chiến chống Mỹ là:",
+    o: [
+      "sự lãnh đạo đúng đắn của Đảng",
+      "sự đoàn kết chiến đấu của ba nước Đông Dương",
+      "sự giúp đỡ của Trung Quốc, Liên Xô và các nước xã hội chủ nghĩa",
+      "phong trào phản đối chiến tranh của Mỹ ở Việt Nam"
+    ],
+    a: 0
+  },
+  {
+    q: "Nội dung nào sau đây phản ánh đúng điểm tương đồng giữa chiến dịch Điện Biên Phủ (1954) và chiến dịch Hồ Chí Minh (1975) ở Việt Nam?",
+    o: [
+      "Là trận quyết chiến chiến lược kết thúc thắng lợi hoàn toàn cuộc kháng chiến.",
+      "Thực hiện phương châm lấy yếu đánh mạnh, lấy ít địch nhiều.",
+      "Là trận quyết chiến chiến lược huy động cao nhất sức mạnh của dân tộc.",
+      "Tấn công trực diện vào cơ quan đầu não của đối phương."
+    ],
+    a: 0
+  },
+  {
+    q: "Ở Việt Nam, cuộc kháng chiến chống Mĩ, cứu nước (1954–1975) có điểm mới nào sau đây so với cuộc kháng chiến chống thực dân Pháp (1945–1954)?",
+    o: [
+      "Hoàn thành đồng thời nhiệm vụ kháng chiến và gây dựng cơ sở cho chế độ mới.",
+      "Thực hiện tư tưởng tiến công bằng sức mạnh của lực lượng vũ trang ba thứ quân.",
+      "Kết hợp khởi nghĩa từng phần của quần chúng nhân dân với chiến tranh cách mạng.",
+      "Tiến hành tuần tự hai cuộc cách mạng ở hai miền đất nước với mục tiêu thống nhất."
+    ],
+    a: 3
+  },
+  {
+    q: "Chiến thắng Đường 14–Phước Long (đầu năm 1975) có tác động nào sau đây đối với tiến trình cách mạng miền Nam Việt Nam?",
+    o: [
+      "Củng cố quyết tâm chiến lược giải phóng hoàn toàn miền Nam.",
+      "Chuyển cách mạng miền Nam từ thế giữ gìn lực lượng sang thế tiến công.",
+      "Lần đầu khẳng định bạo lực cách mạng là con đường giải phóng miền Nam.",
+      "Buộc Mĩ xuống thang chiến tranh và chấp nhận đàm phán tại Hội nghị Pari."
+    ],
+    a: 0
+  },
+  {
+    q: "Chiến dịch Hồ Chí Minh (1975) được đánh giá là",
+    o: [
+      "chiến dịch có quy mô lớn nhất trong lịch sử dân tộc.",
+      "chiến dịch mang tính chất tiến công tổng hợp và toàn diện.",
+      "chiến dịch kết hợp tác chiến hiệp đồng binh chủng hiện đại.",
+      "tất cả các ý trên."
+    ],
+    a: 3
+  },
+  {
+    q: "Chiến thắng nào sau đây đã góp phần trực tiếp dẫn đến việc Mĩ phải ký Hiệp định Pari năm 1973?",
+    o: [
+      "Chiến thắng Quảng Trị (1972)",
+      "Chiến thắng “Điện Biên Phủ trên không” (12/1972)",
+      "Chiến thắng Tây Nguyên (3/1975)",
+      "Chiến thắng Phước Long (1/1975)"
+    ],
+    a: 1
+  },
+  {
+    q: "Sau Hiệp định Pari 1973, nhiệm vụ trọng tâm của cách mạng miền Nam là",
+    o: [
+      "chống bình định, lấn chiếm của địch.",
+      "chuẩn bị lực lượng cho cuộc tổng tiến công cuối cùng.",
+      "xây dựng chính quyền cách mạng tại các vùng giải phóng.",
+      "phối hợp với miền Bắc để tái thiết đất nước."
+    ],
+    a: 0
+  },
+  {
+    q: "Điểm nổi bật trong nghệ thuật quân sự của chiến dịch Hồ Chí Minh (1975) là",
+    o: [
+      "tấn công thần tốc, bất ngờ, chắc thắng.",
+      "kết hợp tiến công và nổi dậy đồng loạt trên toàn miền Nam.",
+      "tập trung lực lượng đánh đòn quyết định.",
+      "tất cả các ý trên."
+    ],
+    a: 3
+  },
+  {
+    q: "Thắng lợi của cuộc kháng chiến chống Mỹ cứu nước (1954–1975) có ý nghĩa quốc tế sâu sắc vì",
+    o: [
+      "đã cổ vũ phong trào giải phóng dân tộc trên toàn thế giới.",
+      "chứng minh khả năng đánh thắng đế quốc Mỹ của một dân tộc nhỏ bé.",
+      "góp phần làm suy yếu chủ nghĩa đế quốc và hệ thống thuộc địa.",
+      "tất cả các ý trên."
+    ],
+    a: 3
+  },
+  {
+    q: "Sự kiện nào đánh dấu sự kết thúc hoàn toàn cuộc kháng chiến chống Mỹ cứu nước của nhân dân Việt Nam?",
+    o: [
+      "Chiến thắng Phước Long (tháng 1/1975)",
+      "Chiến thắng Tây Nguyên (tháng 3/1975)",
+      "Giải phóng Sài Gòn (30/4/1975)",
+      "Tổng tuyển cử thống nhất đất nước (1976)"
+    ],
+    a: 2
+  },
+  {
+    q: "Nguyên tắc quan trọng nhất trong đường lối cách mạng của Đảng trong kháng chiến chống Mỹ là",
+    o: [
+      "dựa chắc vào lực lượng cách mạng trong nước.",
+      "kết hợp chặt chẽ giữa đấu tranh quân sự với ngoại giao.",
+      "giữ vững vai trò lãnh đạo của Đảng.",
+      "tất cả các ý trên."
+    ],
+    a: 3
+  },
+  {
+    q: "Chiến dịch nào sau đây không nằm trong kế hoạch tiến công chiến lược Đông – Xuân 1953–1954?",
+    o: [
+      "Chiến dịch Trung Lào",
+      "Chiến dịch Thượng Lào",
+      "Chiến dịch Tây Bắc",
+      "Chiến dịch Quảng Nam"
+    ],
+    a: 3
+  },
+  {
+    q: "Theo Hiệp định Giơnevơ 1954, việc thống nhất Việt Nam sẽ được thực hiện bằng",
+    o: [
+      "bầu cử tự do trong cả nước vào tháng 7/1956.",
+      "tổng tuyển cử do Liên Hợp Quốc giám sát.",
+      "thương lượng giữa hai miền Nam – Bắc.",
+      "cuộc tổng khởi nghĩa của nhân dân miền Nam."
+    ],
+    a: 0
+  },
+  {
+    q: "Nội dung nào dưới đây KHÔNG phải là hậu quả của việc Mĩ dựng lên chính quyền Ngô Đình Diệm sau năm 1954?",
+    o: [
+      "Chia cắt lâu dài đất nước Việt Nam.",
+      "Đàn áp phong trào yêu nước ở miền Nam.",
+      "Thực hiện cải cách ruộng đất ở miền Nam.",
+      "Bãi bỏ hiệp định Giơnevơ."
+    ],
+    a: 2
+  }
+];
+
+/* ============ HIỂN THỊ CÂU HỎI ============ */
+const form=document.getElementById('quizForm');
+questions.forEach((item,i)=>{
+const div=document.createElement('div');
+div.className='question';
+div.innerHTML=`<h3>Câu ${i+1}. ${item.q}</h3><div class='options'>`+
+item.o.map((op,j)=>`<label><input type='radio' name='q${i}' value='${j}'> ${String.fromCharCode(65+j)}. ${op}</label>`).join('')+
+'</div>';
+form.appendChild(div);
+});
+
+/* ============ NỘP BÀI – CHẤM ĐIỂM ============ */
+function submitQuiz(){
+let score=0;
+questions.forEach((q,i)=>{
+const opts=document.querySelectorAll(`input[name='q${i}']`);
+opts.forEach((op,idx)=>{
+if(idx===q.a) op.parentElement.classList.add('correct');
+});
+const sel=document.querySelector(`input[name='q${i}']:checked`);
+if(sel){
+if(Number(sel.value)===q.a) score++;
+else sel.parentElement.classList.add('wrong');
+}
+});
+document.getElementById('result').innerHTML=`✅ Kết quả: <b>${score}/95</b> câu đúng — Quy đổi: <b>${(score/80*10).toFixed(2)}</b> điểm`;
+}
+
+/* ============ ĐẾM GIỜ 45 PHÚT ============ */
+let time=45*60;
+const timer=setInterval(()=>{
+if(time<=0){clearInterval(timer);submitQuiz();return;}
+time--;
+let m=Math.floor(time/60);
+let s=time%60;
+document.getElementById('time').textContent=`${m}:${s.toString().padStart(2,'0')}`;
+},1000);
+</script>
+</body>
+</html>
