@@ -957,7 +957,7 @@ if(Number(sel.value)===q.a) score++;
 else sel.parentElement.classList.add('wrong');
 }
 });
-document.getElementById('result').innerHTML=`✅ Kết quả: <b>${score}/95</b> câu đúng — Quy đổi: <b>${(score/80*10).toFixed(2)}</b> điểm`;
+document.getElementById('result').innerHTML=`✅ Kết quả: <b>${score}/95</b> câu đúng — Quy đổi: <b>${(score/95*10).toFixed(2)}</b> điểm`;
 }
 
 /* ============ ĐẾM GIỜ 45 PHÚT ============ */
@@ -972,3 +972,4 @@ document.getElementById('time').textContent=`${m}:${s.toString().padStart(2,'0')
 </script>
 </body>
 </html>
+
